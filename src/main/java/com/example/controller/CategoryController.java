@@ -7,12 +7,13 @@ import com.example.service.RoomService;
 import com.example.service.CategoryService;
 import com.example.service.ReservationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/categories")
+@Controller
+@RequestMapping("/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;

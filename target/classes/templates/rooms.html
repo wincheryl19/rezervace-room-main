@@ -46,7 +46,13 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Dynamicky generované řádky -->
+            <tr th:each="room : ${rooms}">
+                <td th:text="${room.id}"></td>
+                <td th:text="${room.name}"></td>
+                <td th:text="${room.capacity}"></td>
+                <td th:text="${room.equipment} ?: '—'"></td>
+                <td th:text="${room.category != null ? room.category.name : '—'}"></td>
+            </tr>
         </tbody>
     </table>
 </div>
