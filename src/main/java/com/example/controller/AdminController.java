@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import com.example.entity.Reservation;
+import com.example.entity.Role;
 import com.example.entity.User;
 import com.example.service.RoomService;
 import com.example.service.CategoryService;
@@ -12,28 +14,29 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.example.entity.Role;
+
 import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final RoomService RoomService;
+    private final RoomService roomService;
     private final CategoryService categoryService;
-    private final ReservationService ReservationService;
+    private final ReservationService reservationService;
     private final UserService userService;
 
-    public AdminController(RoomService RoomService, CategoryService categoryService, ReservationService ReservationService,
+    public AdminController(RoomService roomService, CategoryService categoryService, ReservationService reservationService,
                            UserService userService) {
-        this.RoomService = RoomService;
+        this.roomService = roomService;
         this.categoryService = categoryService;
-        this.ReservationService = ReservationService;
+        this.reservationService = reservationService;
         this.userService = userService;
     }
 
     @GetMapping
     public String adminPage(Model model) {
+        // Načti uživatele
         List<User> users = userService.findAllUsers().stream()
                 .map(userDto -> {
                     User user = new User();
@@ -51,12 +54,17 @@ public class AdminController {
                 .toList();
 
         model.addAttribute("users", users);
+
+        // Načti rezervace
+        List<Reservation> reservations = reservationService.getAllReservations();
+        model.addAttribute("reservations", reservations); // Přidání rezervací do modelu
+
         return "admin/admin"; // Šablona pro admin stránku
     }
 
     @GetMapping("/Rooms")
     public String RoomsPage(Model model) {
-        model.addAttribute("Rooms", RoomService.getAllRooms());
+        model.addAttribute("Rooms", roomService.getAllRooms());
         model.addAttribute("categories", categoryService.getAllCategories());
         return "Rooms"; // Odkaz na Rooms.html
     }
@@ -69,7 +77,7 @@ public class AdminController {
 
     @GetMapping("/Reservations")
     public String ReservationsPage(Model model) {
-        model.addAttribute("Reservations", ReservationService.getAllReservations());
+        model.addAttribute("Reservations", reservationService.getAllReservations());
         return "Reservations"; // Odkaz na Reservations.html
     }
 

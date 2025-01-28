@@ -1,13 +1,9 @@
 package com.example.controller;
 
-import com.example.entity.Room;
 import com.example.entity.Category;
-import com.example.entity.Reservation;
-import com.example.service.RoomService;
 import com.example.service.CategoryService;
-import com.example.service.ReservationService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,36 +18,43 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    // ✅ Vrací HTML stránku categories.html a posílá do ní seznam kategorií
     @GetMapping
+    public String showCategoriesPage(Model model) {
+        List<Category> categories = categoryService.getAllCategories();
+
+        System.out.println("Načtené kategorie: " + categories); // ✅ Logování
+
+        model.addAttribute("categories", categories);
+
+        return "categories"; // Musí odpovídat názvu souboru `categories.html`
+    }
+
+    // ✅ API: Vrací seznam kategorií v JSON formátu
+    @GetMapping("/api")
+    @ResponseBody
     public List<Category> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
-        Category category = categoryService.getCategoryById(id);
-        return category != null ? ResponseEntity.ok(category) : ResponseEntity.notFound().build();
+    // ✅ API: Získání konkrétní kategorie podle ID
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public Category getCategoryById(@PathVariable Long id) {
+        return categoryService.getCategoryById(id);
     }
 
-    @PostMapping
+    // ✅ API: Vytvoření nové kategorie
+    @PostMapping("/api")
+    @ResponseBody
     public Category createCategory(@RequestBody Category category) {
         return categoryService.saveCategory(category);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category updatedCategory) {
-        Category existingCategory = categoryService.getCategoryById(id);
-        if (existingCategory != null) {
-            updatedCategory.setId(id);
-            return ResponseEntity.ok(categoryService.saveCategory(updatedCategory));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    // ✅ API: Smazání kategorie
+    @DeleteMapping("/api/{id}")
+    @ResponseBody
+    public void deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
     }
 }
