@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní mapa - Rezervace</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <h1>Interaktivní mapa sportovišť</h1>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+
+    <div id="reservation-form" style="display:none;">
+        <h3>Rezervace sportoviště</h3>
+        <form id="reservationDetails">
+            <label for="reservationTime">Čas rezervace:</label>
+            <input type="datetime-local" id="reservationTime" required>
+            <br>
+            <label for="note">Poznámka:</label>
+            <textarea id="note" rows="3"></textarea>
+            <br>
+            <button type="submit">Rezervovat</button>
+        </form>
+    </div>
+
+    <script>
+        // Inicializace mapy
+        const map = L.map('map').setView([50.0755, 14.4378], 13);  // Nastavení centra mapy (Praha)
+
+        // Přidání dlaždic OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Přidání markerů pro sportoviště
+        const locations = [
+            { name: 'Tělocvična 1', lat: 50.0755, lng: 14.4378 },
+            { name: 'Bazén', lat: 50.0800, lng: 14.4500 },
+            { name: 'Fotbalové hřiště', lat: 50.0600, lng: 14.4600 }
+        ];
+
+        // Funkce pro přidání markeru
+        locations.forEach(location => {
+            const marker = L.marker([location.lat, location.lng]).addTo(map);
+            marker.bindPopup(location.name);
+
+            // Přidání event listeneru pro kliknutí na marker
+            marker.on('click', function () {
+                showReservationForm(location);
+            });
+        });
+
+        // Funkce pro zobrazení formuláře pro rezervaci
+        function showReservationForm(location) {
+            // Zobrazení formuláře
+            document.getElementById("reservation-form").style.display = "block";
+            document.getElementById("reservationDetails").onsubmit = function(event) {
+                event.preventDefault();
+                // Získání údajů z formuláře
+                const reservationTime = document.getElementById("reservationTime").value;
+                const note = document.getElementById("note").value;
+                alert(`Rezervováno na: ${location.name}\nČas: ${reservationTime}\nPoznámka: ${note}`);
+                // Tady byste posílali data do backendu pro uložení rezervace
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Správa kategorií</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Správa kategorií</h1>
+
+    <!-- Formulář pro přidání kategorie -->
+    <form action="/categories/add" method="post" class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" name="name" placeholder="Název kategorie" required>
+            <button class="btn btn-primary" type="submit">Přidat kategorii</button>
+        </div>
+    </form>
+
+    <!-- Tabulka kategorií -->
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Název</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="category : ${categories}">
+            <td th:text="${category.id}"></td>
+            <td th:text="${category.name}"></td>
+            <td>
+                <form th:action="@{/categories/delete/{id}(id=${category.id})}" method="post" class="d-inline">
+                    <button class="btn btn-danger btn-sm">Smazat</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
