@@ -4,12 +4,9 @@ import com.example.entity.Room;
 import com.example.entity.Category;
 import com.example.service.RoomService;
 import com.example.service.CategoryService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/rooms")
@@ -23,61 +20,46 @@ public class RoomController {
         this.categoryService = categoryService;
     }
 
-    //   Vrací HTML stránku `rooms.html`
     @GetMapping
     public String showRoomsPage(Model model) {
-        List<Room> rooms = roomService.getAllRooms();
-        List<Category> categories = categoryService.getAllCategories();
-
-        System.out.println("Načtené místnosti: " + rooms);
-        System.out.println("Načtené kategorie: " + categories);
-
-        model.addAttribute("rooms", rooms);
-        model.addAttribute("categories", categories);
-
-        return "rooms"; // Musí odpovídat názvu `rooms.html` v `templates/`
+        model.addAttribute("rooms", roomService.getAllRooms());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("room", new Room()); // Nový objekt pro formulář
+        return "rooms";
     }
 
-    //   API: Vrací JSON se všemi místnostmi
-    @GetMapping("/api")
-    @ResponseBody
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
-    }
-
-    //   API: Získání konkrétní místnosti podle ID
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Room> getRoomById(@PathVariable Long id) {
+    //   Formulář pro úpravu místnosti
+    @GetMapping("/edit/{id}")
+    public String editRoom(@PathVariable Long id, Model model) {
         Room room = roomService.getRoomById(id);
-        return room != null ? ResponseEntity.ok(room) : ResponseEntity.notFound().build();
-    }
-
-    //   API: Vytvoření nové místnosti
-    @PostMapping("/api")
-    @ResponseBody
-    public Room createRoom(@RequestBody Room room) {
-        return roomService.saveRoom(room);
-    }
-
-    //   API: Aktualizace místnosti
-    @PutMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Room> updateRoom(@PathVariable Long id, @RequestBody Room updatedRoom) {
-        Room existingRoom = roomService.getRoomById(id);
-        if (existingRoom != null) {
-            updatedRoom.setId(id);
-            return ResponseEntity.ok(roomService.saveRoom(updatedRoom));
-        } else {
-            return ResponseEntity.notFound().build();
+        if (room == null) {
+            return "redirect:/rooms"; // Pokud místnost neexistuje, přesměrovat zpět
         }
+        model.addAttribute("room", room);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "edit-room"; // Odpovídá souboru `edit-room.html`
     }
 
-    //   API: Smazání místnosti
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+    //   Uložení upravené místnosti
+    @PostMapping("/edit/{id}")
+    public String updateRoom(@PathVariable Long id, @ModelAttribute Room updatedRoom) {
+        updatedRoom.setId(id);
+        roomService.saveRoom(updatedRoom);
+        return "redirect:/rooms"; // Přesměrování zpět na seznam místností
+    }
+
+    //   Uložení nové místnosti (data z formuláře na `rooms.html`)
+    @PostMapping("/add")
+    public String addRoom(@ModelAttribute Room room) {
+        roomService.saveRoom(room);
+        return "redirect:/rooms"; // Přesměrování zpět na seznam místností
+    }
+
+    //   Odstranění místnosti (přímé smazání na `rooms.html`)
+    @PostMapping("/delete/{id}")
+    public String deleteRoom(@PathVariable Long id) {
         roomService.deleteRoom(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/rooms"; // Přesměrování po smazání
     }
 }
+
