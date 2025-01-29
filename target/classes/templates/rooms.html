@@ -12,6 +12,11 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">Správa místností</h1>
 
+    <nav class="mb-4">
+        <a href="/categories" class="btn btn-secondary">Kategorie</a>
+        <a href="/reservations" class="btn btn-secondary">Rezervace</a>
+    </nav>
+
     <form th:action="@{/rooms/add}" method="post" class="mb-4">
         <input type="hidden" name="id" th:value="${room?.id}"/> <!-- Skryté pole pro ID -->
         <div class="row">
@@ -39,7 +44,7 @@
         </div>
     </form>
 
-    <table class="table table-hover table-bordered align-middle">
+    <table class="table table-hover table-bordered align-middle" id="roomTable">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>

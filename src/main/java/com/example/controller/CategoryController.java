@@ -5,6 +5,7 @@ import com.example.service.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -18,43 +19,34 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    //   Vrací HTML stránku categories.html a posílá do ní seznam kategorií
+    //   1. Zobrazení stránky `categories.html`
     @GetMapping
     public String showCategoriesPage(Model model) {
-        List<Category> categories = categoryService.getAllCategories();
-
-        System.out.println("Načtené kategorie: " + categories); //   Logování
-
-        model.addAttribute("categories", categories);
-
-        return "categories"; // Musí odpovídat názvu souboru `categories.html`
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("newCategory", new Category());
+        return "categories";
     }
 
-    //   API: Vrací seznam kategorií v JSON formátu
-    @GetMapping("/api")
-    @ResponseBody
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+    //   2. Přidání nové kategorie
+    @PostMapping
+    public String addCategory(@ModelAttribute("newCategory") Category category) {
+        categoryService.saveCategory(category);
+        return "redirect:/categories"; // Přesměrování zpět na stejnou stránku
     }
 
-    //   API: Získání konkrétní kategorie podle ID
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public Category getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+    //   3. Úprava existující kategorie
+    @PostMapping("/edit/{id}")
+    public String updateCategory(@PathVariable Long id, @ModelAttribute Category updatedCategory, RedirectAttributes redirectAttributes) {
+        updatedCategory.setId(id);
+        categoryService.saveCategory(updatedCategory);
+        redirectAttributes.addFlashAttribute("successMessage", "Kategorie byla úspěšně upravena!");
+        return "redirect:/categories";
     }
 
-    //   API: Vytvoření nové kategorie
-    @PostMapping("/api")
-    @ResponseBody
-    public Category createCategory(@RequestBody Category category) {
-        return categoryService.saveCategory(category);
-    }
-
-    //   API: Smazání kategorie
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public void deleteCategory(@PathVariable Long id) {
+    //   4. Smazání kategorie
+    @PostMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
+        return "redirect:/categories";
     }
 }
