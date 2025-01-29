@@ -7,14 +7,26 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li>
+                        <a th:href="@{/rooms}" class="btn btn-primary">Místnosti</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/categories}" class="btn btn-secondary">Kategorie</a>
+                    </li>
+                    <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link active" th:href="@{/logout}">Odhlásit se</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-5">
         <h1 class="text-center mb-4">Seznam rezervací</h1>
-
-        <!-- Navigace -->
-        <nav class="mb-4">
-            <a href="/rooms" class="btn btn-primary">Místnosti</a>
-            <a href="/categories" class="btn btn-secondary">Kategorie</a>
-        </nav>
 
         <!-- Formulář pro přidání rezervace -->
     <form action="/reservations" method="post" class="mb-4">

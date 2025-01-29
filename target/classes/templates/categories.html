@@ -7,52 +7,65 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Správa kategorií</h1>
-
-    <nav class="mb-4">
-        <a href="/rooms" class="btn btn-primary">Místnosti</a>
-        <a href="/reservations" class="btn btn-secondary">Rezervace</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li>
+                        <a th:href="@{/rooms}" class="btn btn-primary">Místnosti</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/reservations}" class="btn btn-secondary">Rezervace</a>
+                    </li>
+                    <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link active" th:href="@{/logout}">Odhlásit se</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
 
-    <!-- Formulář pro přidání kategorie -->
-    <form action="/categories" method="post" class="mb-4">
-        <label for="name" class="form-label">Název kategorie:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-        <button class="btn btn-primary mt-2" type="submit">Přidat kategorii</button>
-    </form>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Správa kategorií</h1>
 
-    <!-- Tabulka kategorií -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Název</th>
-                <th>Akce</th>
-                <th:block th:if="${successMessage}">
-                    <script>
-                        alert("[[${successMessage}]]");
-                    </script>
-                </th:block>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="category : ${categories}">
-                <td th:text="${category.id}"></td>
-                <td>
-                    <form th:action="@{/categories/edit/{id}(id=${category.id})}" method="post" class="d-inline">
-                        <input type="text" name="name" th:value="${category.name}" required>
-                        <button type="submit" class="btn btn-warning btn-sm">Upravit</button>
-                    </form>
-                </td>
-                <td>
-                    <form th:action="@{/categories/delete/{id}(id=${category.id})}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Smazat</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <!-- Formulář pro přidání kategorie -->
+        <form action="/categories" method="post" class="mb-4">
+            <label for="name" class="form-label">Název kategorie:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+            <button class="btn btn-primary mt-2" type="submit">Přidat kategorii</button>
+        </form>
+
+        <!-- Tabulka kategorií -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Název</th>
+                    <th>Akce</th>
+                    <th:block th:if="${successMessage}">
+                        <script>
+                            alert("[[${successMessage}]]");
+                        </script>
+                    </th:block>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="category : ${categories}">
+                    <td th:text="${category.id}"></td>
+                    <td>
+                        <form th:action="@{/categories/edit/{id}(id=${category.id})}" method="post" class="d-inline">
+                            <input type="text" name="name" th:value="${category.name}" required>
+                            <button type="submit" class="btn btn-warning btn-sm">Upravit</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{/categories/delete/{id}(id=${category.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Smazat</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
