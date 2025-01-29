@@ -39,7 +39,7 @@
             </div>
 
             <div class="col-md-3">
-                <label for="user">Uživatel:</label>
+                <label for="user" class="form-label">Uživatel:</label>
                 <select id="user" name="user.id" class="form-select" required>
                     <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"
                         th:selected="${!isAdmin}"></option>
