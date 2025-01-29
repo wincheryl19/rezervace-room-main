@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Collections;  // ✅ Přidáno pro opravu chyby
+import java.util.Collections;  //     Přidáno pro opravu chyby
 
 @Controller
 @RequestMapping("/reservations")
@@ -29,7 +29,7 @@ public class ReservationController {
         this.userService = userService;
     }
 
-    // ✅ Zobrazení stránky s rezervacemi
+    //     Zobrazení stránky s rezervacemi
     @GetMapping
     public String showReservationsPage(Model model, Authentication authentication) {
         String email = authentication.getName();
@@ -52,7 +52,7 @@ public class ReservationController {
         return "reservations";
     }
 
-    // ✅ Přidání rezervace
+    //     Přidání rezervace
     @PostMapping
     public String addReservation(@ModelAttribute("newReservation") Reservation reservation, Authentication authentication) {
         String email = authentication.getName();
@@ -67,7 +67,7 @@ public class ReservationController {
         return "redirect:/reservations";
     }
 
-    // ✅ Smazání rezervace
+    //     Smazání rezervace
     @PostMapping("/delete/{id}")
     public String deleteReservation(@PathVariable Long id) {
         reservationService.deleteReservation(id);

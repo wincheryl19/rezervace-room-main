@@ -76,7 +76,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    // Aktualizace uživatele
+    //     Aktualizace uživatele
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(existingUser -> {
             existingUser.setName(updatedUser.getName());
@@ -97,5 +97,13 @@ public class UserService {
                     return user;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Role findRoleByName(String roleName) {
+        return roleRepository.findByName(roleName);
+    }
+
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
     }
 }

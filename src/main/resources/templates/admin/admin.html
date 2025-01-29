@@ -73,9 +73,7 @@
                                 <td th:text="${user.email}"></td>
                                 <td th:text="${user.role != null && user.role.name != null ? (user.role.name == 'ROLE_ADMIN' ? 'Admin' : 'User') : 'No role'}"></td>
                                 <td class="text-center">
-                                    <form th:action="@{/admin/user/edit/{id}(id=${user.id})}" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-warning btn-sm">Upravit</button>
-                                    </form>
+                                    <a th:href="@{/admin/user/edit/{id}(id=${user.id})}" class="btn btn-warning btn-sm">Upravit</a>
                                 </td>
                                 <td class="text-center">
                                     <form th:action="@{/admin/user/delete/{id}(id=${user.id})}" method="post" class="d-inline">
@@ -89,14 +87,12 @@
             </div>
         </div>
 
-        <div class="container mt-4">
-            <h2 class="text-center mb-4">Administrace</h2>
-
-            <!-- Navigační tlačítka -->
-            <div class="d-flex justify-content-center gap-3">
-
-            </div>
-        </div>
+    </div>
+    <div th:if="${successUser}" class="alert alert-success text-center">
+        <p th:text="${successUser}"></p>
+    </div>
+    <div th:if="${errorUser}" class="alert alert-danger text-center">
+        <p th:text="${errorUser}"></p>
     </div>
 </div>
 </body>

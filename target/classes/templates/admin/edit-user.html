@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Úprava uživatele</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navigace -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/admin}">Admin Panel</a>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Upravit uživatele</h2>
+
+    <div class="card shadow-lg p-4">
+        <form th:action="@{/admin/user/update/{id}(id=${user.id})}" method="post">
+            <input type="hidden" th:value="${user.id}" name="id">
+
+            <div class="mb-3">
+                <label for="name" class="form-label fw-bold">Jméno</label>
+                <input type="text" class="form-control" id="name" name="name" th:value="${user.name}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label fw-bold">E-mail</label>
+                <input type="email" class="form-control" id="email" name="email" th:value="${user.email}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="role" class="form-label fw-bold">Role</label>
+                <select class="form-select" id="role" name="role.name">
+                    <option th:each="r : ${roles}" th:value="${r.name}" th:text="${r.name}"
+                        th:selected="${user.role.name == r.name}"></option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/admin}" class="btn btn-secondary">Zpět</a>
+                <button type="submit" class="btn btn-primary">Uložit změny</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

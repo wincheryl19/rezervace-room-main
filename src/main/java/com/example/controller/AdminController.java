@@ -1,18 +1,11 @@
 package com.example.controller;
 
-import com.example.entity.Reservation;
 import com.example.entity.Role;
 import com.example.entity.User;
-import com.example.service.RoomService;
-import com.example.service.CategoryService;
-import com.example.service.ReservationService;
 import com.example.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -21,66 +14,71 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final RoomService roomService;
-    private final CategoryService categoryService;
-    private final ReservationService reservationService;
     private final UserService userService;
 
-    public AdminController(RoomService roomService, CategoryService categoryService, ReservationService reservationService,
-                           UserService userService) {
-        this.roomService = roomService;
-        this.categoryService = categoryService;
-        this.reservationService = reservationService;
+    public AdminController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     public String adminPage(Model model) {
-        // Načti uživatele
         List<User> users = userService.findAllUsers().stream()
                 .map(userDto -> {
                     User user = new User();
                     user.setId(userDto.getId());
                     user.setEmail(userDto.getEmail());
-                    user.setName(userDto.getName()); // Nastavení jména
-
-                    // Vyhledání objektu Role podle názvu
+                    user.setName(userDto.getName());
                     Role role = new Role();
-                    role.setName(userDto.getRole()); // Nastavení názvu role (ROLE_ADMIN, ROLE_USER)
-                    user.setRole(role); // Přiřazení role uživateli
-
+                    role.setName(userDto.getRole());
+                    user.setRole(role);
                     return user;
                 })
                 .toList();
 
         model.addAttribute("users", users);
-
-        // Načti rezervace
-        List<Reservation> reservations = reservationService.getAllReservations();
-        model.addAttribute("reservations", reservations); // Přidání rezervací do modelu
-
-        return "admin/admin"; // Šablona pro admin stránku
+        return "admin/admin";
     }
 
-    @GetMapping("/Rooms")
-    public String RoomsPage(Model model) {
-        model.addAttribute("Rooms", roomService.getAllRooms());
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "Rooms"; // Odkaz na Rooms.html
+    @GetMapping("/user/edit/{id}")
+    public String editUser(@PathVariable Long id, Model model) {
+        User user = userService.findUserById(id);
+        if (user == null) {
+            return "redirect:/admin"; // Pokud uživatel neexistuje, přesměruj zpět
+        }
+
+        List<Role> roles = userService.getAllRoles(); // Načteme všechny role
+
+        model.addAttribute("user", user);
+        model.addAttribute("roles", roles); // Přidáme role do modelu
+        return "admin/edit-user";
     }
 
-    @GetMapping("/categories")
-    public String categoriesPage(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "categories"; // Odkaz na categories.html
+    @PostMapping("/user/update/{id}")
+    public String updateUser(@PathVariable Long id, @ModelAttribute User updatedUser, RedirectAttributes redirectAttributes) {
+        User existingUser = userService.findUserById(id);
+        if (existingUser == null) {
+            redirectAttributes.addFlashAttribute("errorUser", "Uživatel nebyl nalezen.");
+            return "redirect:/admin"; // Přesměrování zpět na admin, pokud uživatel neexistuje
+        }
+
+        // Správná konverze role (aby odpovídala objektu Role)
+        Role role = userService.findRoleByName(updatedUser.getRole().getName());
+        if (role == null) {
+            redirectAttributes.addFlashAttribute("errorUser", "Role nebyla nalezena.");
+            return "redirect:/admin";
+        }
+
+        existingUser.setName(updatedUser.getName());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setRole(role); // Nastavíme správný objekt Role
+
+        userService.updateUser(id, existingUser);
+        redirectAttributes.addFlashAttribute("successUser", "Uživatel byl úspěšně aktualizován.");
+
+        return "redirect:/admin"; // Přesměrování zpět na admin panel po úspěšné změně
     }
 
-    @GetMapping("/Reservations")
-    public String ReservationsPage(Model model) {
-        model.addAttribute("Reservations", reservationService.getAllReservations());
-        return "Reservations"; // Odkaz na Reservations.html
-    }
-
+    //     Smazání uživatele
     @PostMapping("/user/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
