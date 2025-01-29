@@ -1,70 +1,58 @@
 package com.example.controller;
 
 import com.example.entity.Reservation;
+import com.example.entity.Room;
+import com.example.entity.User;
 import com.example.service.ReservationService;
-import org.springframework.http.ResponseEntity;
+import com.example.service.RoomService;
+import com.example.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Controller  //  Změněno z @RestController na @Controller pro HTML stránku
+@Controller
 @RequestMapping("/reservations")
 public class ReservationController {
-    private final ReservationService reservationService;
 
-    public ReservationController(ReservationService reservationService) {
+    private final ReservationService reservationService;
+    private final RoomService roomService;
+    private final UserService userService;
+
+    public ReservationController(ReservationService reservationService, RoomService roomService, UserService userService) {
         this.reservationService = reservationService;
+        this.roomService = roomService;
+        this.userService = userService;
     }
 
-    //  Vrací Thymeleaf šablonu `reservations.html`
+    // ✅ Zobrazení stránky s rezervacemi
     @GetMapping
     public String showReservationsPage(Model model) {
         model.addAttribute("reservations", reservationService.getAllReservations());
-        return "reservations"; // Odpovídá názvu `reservations.html` v templates/
+        model.addAttribute("rooms", roomService.getAllRooms());
+        model.addAttribute("users", userService.findAllUsers()); // Pro výběr uživatele
+        model.addAttribute("newReservation", new Reservation()); // Pro formulář
+        return "reservations";
     }
 
-    //  API endpoint pro získání rezervací ve formátu JSON (použití na /reservations/api)
-    @GetMapping("/api")
-    @ResponseBody
-    public List<Reservation> getAllReservations() {
-        return reservationService.getAllReservations();
+    // ✅ Přidání rezervace
+    @PostMapping
+    public String addReservation(@ModelAttribute("newReservation") Reservation reservation) {
+        reservationService.saveReservation(reservation);
+        return "redirect:/reservations"; // Přesměrování zpět
     }
 
-    //  API pro získání jedné rezervace podle ID
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Reservation> getReservationById(@PathVariable Long id) {
-        Reservation reservation = reservationService.getReservationById(id);
-        return reservation != null ? ResponseEntity.ok(reservation) : ResponseEntity.notFound().build();
+    // ✅ Úprava rezervace
+    @PostMapping("/edit/{id}")
+    public String updateReservation(@PathVariable Long id, @ModelAttribute Reservation updatedReservation) {
+        updatedReservation.setId(id);
+        reservationService.saveReservation(updatedReservation);
+        return "redirect:/reservations";
     }
 
-    //  API pro vytvoření rezervace
-    @PostMapping("/api")
-    @ResponseBody
-    public Reservation createReservation(@RequestBody Reservation reservation) {
-        return reservationService.saveReservation(reservation);
-    }
-
-    //  API pro aktualizaci rezervace
-    @PutMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation updatedReservation) {
-        Reservation existingReservation = reservationService.getReservationById(id);
-        if (existingReservation != null) {
-            updatedReservation.setId(id);
-            return ResponseEntity.ok(reservationService.saveReservation(updatedReservation));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    //  API pro smazání rezervace
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+    // ✅ Smazání rezervace
+    @PostMapping("/delete/{id}")
+    public String deleteReservation(@PathVariable Long id) {
         reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/reservations";
     }
 }

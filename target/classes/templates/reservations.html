@@ -16,39 +16,64 @@
             <a href="/categories" class="btn btn-secondary">Kategorie</a>
         </nav>
 
-        <!-- Tabulka rezervací -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Uživatel</th>
-                    <th>Místnost</th>
-                    <th>Kategorie</th>
-                    <th>Datum rezervace</th>
-                    <th>Začátek</th>
-                    <th>Konec</th>
-                    <th>Poznámka</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="reservation : ${reservations}">
-                    <td th:text="${reservation.id}"></td>
-                    <td th:text="${reservation.user.name}"></td>
-                    <td>
-                        <a th:href="@{/rooms}" th:text="${reservation.room.name}"></a>
-                    </td>
-                    <td>
-                        <a th:href="@{/categories}" th:text="${reservation.room.category.name}"></a>
-                    </td>
-                    <td th:text="${reservation.reservationDate}"></td>
-                    <td th:text="${reservation.startTime} ?: '—'"></td>
-                    <td th:text="${reservation.endTime} ?: '—'"></td>
-                    <td th:text="${reservation.note} ?: '—'"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Formulář pro přidání rezervace -->
+    <form action="/reservations" method="post" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="room" class="form-label">Místnost:</label>
+                <select id="room" name="room.id" class="form-select" required>
+                    <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.name}"></option>
+                </select>
+            </div>
 
-    <script src="/js/reservations.js" defer></script>
+            <div class="col-md-3">
+                <label for="user" class="form-label">Uživatel:</label>
+                <select id="user" name="user.id" class="form-select" required>
+                    <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="date" class="form-label">Datum rezervace:</label>
+                <input type="date" class="form-control" id="date" name="reservationDate" required>
+            </div>
+
+            <div class="col-md-3">
+                <label for="note" class="form-label">Poznámka:</label>
+                <input type="text" class="form-control" id="note" name="note">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit">Přidat rezervaci</button>
+    </form>
+
+    <!-- Tabulka rezervací -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Místnost</th>
+                <th>Uživatel</th>
+                <th>Datum</th>
+                <th>Poznámka</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="reservation : ${reservations}">
+                <td th:text="${reservation.id}"></td>
+                <td th:text="${reservation.room.name}"></td>
+                <td th:text="${reservation.user.name}"></td>
+                <td th:text="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')}"></td>
+                <td th:text="${reservation.note} ?: '—'"></td>
+                <td>
+                    <form th:action="@{/reservations/delete/{id}(id=${reservation.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Smazat</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 </body>
 </html>
