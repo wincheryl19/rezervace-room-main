@@ -49,7 +49,7 @@ public class SpringSecurity {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/register/**", "/index", "/", "/login/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")  // Přístup na /admin pouze pro ADMIN
-                .requestMatchers("/reservations/**").hasRole("USER")  // Přístup na /reservations pro USER
+                .requestMatchers("/reservations/**").hasAnyRole("ADMIN", "USER")  // Přístup na /reservations pro USER
                 .anyRequest().authenticated()  // Všechny ostatní žádosti vyžadují přihlášení
             )
             .formLogin(form -> form
